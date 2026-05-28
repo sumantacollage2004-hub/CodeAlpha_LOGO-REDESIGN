@@ -1,0 +1,336 @@
+
+<style>
+  :root {
+    --c-purple-50: #EEEDFE; --c-purple-200: #AFA9EC; --c-purple-400: #7F77DD; --c-purple-600: #534AB7; --c-purple-800: #3C3489;
+    --c-teal-50: #E1F5EE; --c-teal-400: #1D9E75; --c-teal-600: #0F6E56;
+    --c-coral-50: #FAECE7; --c-coral-400: #D85A30; --c-coral-600: #993C1D;
+    --c-amber-400: #BA7517; --c-amber-200: #FAC775;
+    --c-blue-400: #378ADD; --c-blue-50: #E6F1FB;
+    --c-gray-100: #D3D1C7; --c-gray-400: #888780;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans, 'Inter', sans-serif); }
+  .studio { padding: 1.5rem 1rem; }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .studio-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .tab-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab-btn { padding: 6px 14px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all .15s; }
+  .tab-btn.active { background: var(--c-purple-600); color: #fff; border-color: var(--c-purple-600); }
+  .canvas-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 1.5rem; }
+  .logo-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; cursor: pointer; transition: border-color .15s; }
+  .logo-card:hover { border-color: var(--c-purple-400); }
+  .logo-card.selected { border: 2px solid var(--c-purple-600); }
+  .logo-preview { height: 160px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .logo-card-label { padding: 10px 14px; border-top: 0.5px solid var(--color-border-tertiary); }
+  .logo-card-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .logo-card-tag { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .detail-panel { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .detail-preview { background: var(--color-background-primary); border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: center; min-height: 200px; }
+  .detail-info { display: flex; flex-direction: column; gap: 12px; }
+  .detail-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .detail-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .badge-purple { background: var(--c-purple-50); color: var(--c-purple-800); }
+  .badge-teal { background: var(--c-teal-50); color: var(--c-teal-600); }
+  .badge-coral { background: var(--c-coral-50); color: var(--c-coral-600); }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 1.5rem; }
+  .ctrl-label { font-size: 13px; color: var(--color-text-secondary); }
+  .ctrl-swatch-row { display: flex; gap: 6px; }
+  .swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color .15s; }
+  .swatch.active { border-color: var(--color-text-primary); }
+  .bg-toggle-row { display: flex; gap: 6px; }
+  .bg-btn { padding: 5px 12px; font-size: 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+  .bg-btn.active { background: var(--color-text-primary); color: var(--color-background-primary); }
+  .export-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .export-btn { padding: 8px 18px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background .15s; }
+  .export-btn:hover { background: var(--color-background-secondary); }
+  .export-btn.primary { background: var(--c-purple-600); color: #fff; border-color: var(--c-purple-600); }
+  .export-btn.primary:hover { background: var(--c-purple-800); }
+  .section-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+  @media (max-width: 520px) { .detail-panel { grid-template-columns: 1fr; } }
+</style>
+
+<div class="studio">
+  <h2 class="sr-only">Logo redesign studio with four modern variations, color controls, and export options</h2>
+
+  <div class="top-bar">
+    <div class="studio-title">Logo Redesign Studio</div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="setTab('variations')">Variations</button>
+      <button class="tab-btn" onclick="setTab('colors')">Color Themes</button>
+      <button class="tab-btn" onclick="setTab('export')">Export</button>
+    </div>
+  </div>
+
+  <div id="tab-variations">
+    <p class="section-label">Choose a variation</p>
+    <div class="canvas-row" id="logo-grid"></div>
+    <div class="detail-panel" id="detail-panel"></div>
+  </div>
+
+  <div id="tab-colors" style="display:none">
+    <p class="section-label">Color theme</p>
+    <div class="controls" style="margin-bottom:1.5rem">
+      <span class="ctrl-label">Primary color</span>
+      <div class="ctrl-swatch-row" id="swatch-row"></div>
+      <span class="ctrl-label" style="margin-left:12px">Background</span>
+      <div class="bg-toggle-row">
+        <button class="bg-btn active" id="bg-light" onclick="setBg('light')">Light</button>
+        <button class="bg-btn" id="bg-dark" onclick="setBg('dark')">Dark</button>
+        <button class="bg-btn" id="bg-trans" onclick="setBg('trans')">Transparent</button>
+      </div>
+    </div>
+    <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);display:flex;align-items:center;justify-content:center;min-height:220px;" id="theme-preview"></div>
+  </div>
+
+  <div id="tab-export" style="display:none">
+    <p class="section-label">Design notes & export</p>
+    <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem">
+      <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:1rem">
+        Each logo variation is production-ready SVG. For Illustrator or CorelDRAW, export as SVG and open directly.
+        For Figma, paste the SVG code as a vector frame. For Canva, use the PNG export.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Adobe Illustrator</div>
+          <div style="font-size:12px;color:var(--color-text-secondary)">File → Open → .svg — all vectors are editable paths</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Figma</div>
+          <div style="font-size:12px;color:var(--color-text-secondary)">Copy SVG code → Edit → Paste as vector in canvas</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">CorelDRAW</div>
+          <div style="font-size:12px;color:var(--color-text-secondary)">Import → SVG — objects auto-separate into layers</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Canva</div>
+          <div style="font-size:12px;color:var(--color-text-secondary)">Upload SVG → Uploads tab → drag onto canvas</div>
+        </div>
+      </div>
+    </div>
+    <div class="export-row">
+      <button class="export-btn primary" onclick="downloadSVG()"><i class="ti ti-download" aria-hidden="true"></i> Download SVG</button>
+      <button class="export-btn" onclick="copySVG()"><i class="ti ti-copy" aria-hidden="true"></i> Copy SVG code</button>
+      <button class="export-btn" onclick="sendPrompt('Give me the full HTML/CSS/JS source code for this logo redesign studio so I can use it externally')"><i class="ti ti-external-link" aria-hidden="true"></i> Get full source ↗</button>
+    </div>
+    <div id="export-msg" style="font-size:12px;color:var(--color-text-secondary);margin-top:8px;min-height:18px"></div>
+  </div>
+</div>
+
+<script>
+const LOGOS = [
+  {
+    id: 'wordmark',
+    name: 'Modern Wordmark',
+    tag: 'Typography-first',
+    badges: ['Clean', 'Versatile', 'Scalable'],
+    badgeColors: ['purple','teal','coral'],
+    desc: 'A bold geometric wordmark using variable-weight typography. The letter N uses a cutout negative space to imply motion and technology. Works at any size from favicon to billboard.',
+    render: (ac, size=120) => `
+      <svg viewBox="0 0 220 80" width="${size*2.75}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wg1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="${ac}"/>
+            <stop offset="100%" stop-color="${ac}cc"/>
+          </linearGradient>
+        </defs>
+        <rect x="4" y="18" width="44" height="44" rx="10" fill="${ac}"/>
+        <text x="26" y="50" font-family="Georgia,serif" font-size="32" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="auto">N</text>
+        <rect x="16" y="28" width="6" height="24" rx="2" fill="${ac}44"/>
+        <text x="60" y="52" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="${ac}" letter-spacing="-0.5">NEXUS</text>
+        <text x="60" y="68" font-family="Arial,sans-serif" font-size="11" font-weight="400" fill="${ac}99" letter-spacing="3">STUDIO</text>
+        <rect x="60" y="55" width="90" height="1.5" rx="1" fill="${ac}33"/>
+      </svg>`
+  },
+  {
+    id: 'emblem',
+    name: 'Geometric Emblem',
+    tag: 'Icon + text',
+    badges: ['Bold', 'Memorable', 'Modern'],
+    badgeColors: ['purple','teal','coral'],
+    desc: 'An interlocking hexagon mark built from six identical rhombus shapes, creating a sense of unity and precision. The emblem works independently as an app icon or paired with text for full brand use.',
+    render: (ac, size=120) => {
+      const cx=50,cy=50,r=36;
+      const hex = Array.from({length:6},(_,i)=>{
+        const a=(Math.PI/3)*i-Math.PI/6;
+        return `${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`;
+      }).join(' ');
+      const innerHex = Array.from({length:6},(_,i)=>{
+        const a=(Math.PI/3)*i-Math.PI/6;
+        return `${cx+20*Math.cos(a)},${cy+20*Math.sin(a)}`;
+      }).join(' ');
+      return `<svg viewBox="0 0 200 80" width="${size*2.5}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="${hex}" fill="${ac}" transform="translate(-10,0) scale(0.8)"/>
+        <polygon points="${innerHex}" fill="#fff" opacity="0.2" transform="translate(-10,0) scale(0.8)"/>
+        <line x1="${cx-10}" y1="${cy}" x2="${cx+10}" y2="${cy}" stroke="#fff" stroke-width="2.5" transform="translate(-10,0) scale(0.8)"/>
+        <line x1="${cx}" y1="${cy-10}" x2="${cx}" y2="${cy+10}" stroke="#fff" stroke-width="2.5" transform="translate(-10,0) scale(0.8)"/>
+        <text x="95" y="46" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="${ac}" letter-spacing="0.5">NEXUS</text>
+        <text x="95" y="62" font-family="Arial,sans-serif" font-size="10" font-weight="400" fill="${ac}88" letter-spacing="2.5">STUDIO</text>
+      </svg>`;
+    }
+  },
+  {
+    id: 'minimal',
+    name: 'Minimal Line',
+    tag: 'Minimalist',
+    badges: ['Elegant', 'Timeless', 'Flexible'],
+    badgeColors: ['purple','teal','coral'],
+    desc: 'A single-weight line mark inspired by Bauhaus principles. The logomark is constructed from three arcs that form an abstract N, unified by a consistent stroke width. Pairs with a light-weight wordmark for a premium, editorial feel.',
+    render: (ac, size=120) => `
+      <svg viewBox="0 0 220 80" width="${size*2.75}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(8,12)">
+          <circle cx="28" cy="28" r="26" fill="none" stroke="${ac}" stroke-width="2"/>
+          <line x1="16" y1="42" x2="16" y2="14" stroke="${ac}" stroke-width="3" stroke-linecap="round"/>
+          <line x1="16" y1="14" x2="40" y2="42" stroke="${ac}" stroke-width="3" stroke-linecap="round"/>
+          <line x1="40" y1="42" x2="40" y2="14" stroke="${ac}" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <text x="76" y="47" font-family="Arial,sans-serif" font-size="24" font-weight="300" fill="${ac}" letter-spacing="4">NEXUS</text>
+        <text x="76" y="63" font-family="Arial,sans-serif" font-size="10" font-weight="300" fill="${ac}77" letter-spacing="5">STUDIO</text>
+      </svg>`
+  },
+  {
+    id: 'dynamic',
+    name: 'Dynamic Split',
+    tag: 'Bold & energetic',
+    badges: ['Energetic', 'Unique', 'Tech'],
+    badgeColors: ['purple','teal','coral'],
+    desc: 'A split-color treatment where the letterform is divided diagonally, creating visual tension and movement. The accent color on the cut section draws the eye and creates depth without gradients. Ideal for tech, creative, and media brands.',
+    render: (ac, size=120) => `
+      <svg viewBox="0 0 220 80" width="${size*2.75}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="cp-left">
+            <polygon points="4,14 44,14 44,66 4,66"/>
+          </clipPath>
+          <clipPath id="cp-diag">
+            <polygon points="44,14 4,14 4,66 44,66 44,14"/>
+          </clipPath>
+        </defs>
+        <rect x="4" y="14" width="40" height="52" rx="8" fill="${ac}22" stroke="${ac}" stroke-width="1.5"/>
+        <text x="24" y="53" font-family="Arial,sans-serif" font-size="38" font-weight="900" fill="${ac}" text-anchor="middle">N</text>
+        <polygon points="4,14 44,66 44,14" fill="${ac}" opacity="0.15"/>
+        <text x="24" y="53" font-family="Arial,sans-serif" font-size="38" font-weight="900" fill="${ac}" text-anchor="middle" clip-path="url(#cp-diag)" opacity="0.9">N</text>
+        <text x="58" y="46" font-family="Arial,sans-serif" font-size="26" font-weight="800" fill="${ac}">NEXUS</text>
+        <rect x="58" y="50" width="78" height="2.5" rx="1" fill="${ac}"/>
+        <text x="58" y="65" font-family="Arial,sans-serif" font-size="10" font-weight="400" fill="${ac}88" letter-spacing="2.5">STUDIO</text>
+      </svg>`
+  }
+];
+
+const SWATCHES = [
+  { name:'Purple', color:'#534AB7' },
+  { name:'Teal',   color:'#0F6E56' },
+  { name:'Coral',  color:'#993C1D' },
+  { name:'Blue',   color:'#185FA5' },
+  { name:'Amber',  color:'#854F0B' },
+  { name:'Gray',   color:'#444441' },
+];
+
+let selectedLogo = 0;
+let accentColor = SWATCHES[0].color;
+let bgMode = 'light';
+
+function setTab(t) {
+  ['variations','colors','export'].forEach(id => {
+    document.getElementById('tab-'+id).style.display = id===t ? '' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['variations','colors','export'][i]===t);
+  });
+  if(t==='colors') renderColorTab();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('logo-grid');
+  grid.innerHTML = LOGOS.map((l,i) => `
+    <div class="logo-card${i===selectedLogo?' selected':''}" onclick="selectLogo(${i})">
+      <div class="logo-preview" style="background:${bgMode==='dark'?'#1a1a1a':bgMode==='trans'?'repeating-conic-gradient(#ccc 0% 25%,transparent 0% 50%) 0/20px 20px':'#fff'}">
+        ${l.render(accentColor, 60)}
+      </div>
+      <div class="logo-card-label">
+        <div class="logo-card-name">${l.name}</div>
+        <div class="logo-card-tag">${l.tag}</div>
+      </div>
+    </div>
+  `).join('');
+  renderDetail();
+}
+
+function selectLogo(i) {
+  selectedLogo = i;
+  renderGrid();
+}
+
+function renderDetail() {
+  const l = LOGOS[selectedLogo];
+  const panel = document.getElementById('detail-panel');
+  panel.innerHTML = `
+    <div class="detail-preview" style="background:${bgMode==='dark'?'#1a1a1a':bgMode==='trans'?'repeating-conic-gradient(#ccc 0% 25%,transparent 0% 50%) 0/20px 20px':'#fff'}">
+      ${l.render(accentColor, 80)}
+    </div>
+    <div class="detail-info">
+      <div class="detail-title">${l.name}</div>
+      <div class="detail-desc">${l.desc}</div>
+      <div class="badge-row">
+        ${l.badges.map((b,i)=>`<span class="badge badge-${l.badgeColors[i]}">${b}</span>`).join('')}
+      </div>
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Accent: <strong style="color:${accentColor}">${accentColor.toUpperCase()}</strong></div>
+      <button class="export-btn primary" style="margin-top:8px;width:fit-content" onclick="setTab('export')">
+        <i class="ti ti-download" aria-hidden="true"></i> Export this variation
+      </button>
+    </div>`;
+}
+
+function renderSwatches() {
+  const row = document.getElementById('swatch-row');
+  row.innerHTML = SWATCHES.map(s => `
+    <div class="swatch${s.color===accentColor?' active':''}" style="background:${s.color}" title="${s.name}" onclick="setAccent('${s.color}')"></div>
+  `).join('');
+}
+
+function setAccent(c) {
+  accentColor = c;
+  renderGrid();
+  renderSwatches();
+  renderColorTab();
+}
+
+function setBg(mode) {
+  bgMode = mode;
+  ['light','dark','trans'].forEach(m => document.getElementById('bg-'+m)?.classList.toggle('active', m===mode));
+  renderGrid();
+  renderColorTab();
+}
+
+function renderColorTab() {
+  const l = LOGOS[selectedLogo];
+  const tp = document.getElementById('theme-preview');
+  if(!tp) return;
+  tp.style.background = bgMode==='dark'?'#1a1a1a':bgMode==='trans'?'repeating-conic-gradient(#ccc 0% 25%,transparent 0% 50%) 0/20px 20px':'#fff';
+  tp.innerHTML = l.render(accentColor, 100);
+  renderSwatches();
+}
+
+function downloadSVG() {
+  const l = LOGOS[selectedLogo];
+  const svg = l.render(accentColor, 120);
+  const blob = new Blob([svg], {type:'image/svg+xml'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `nexus-logo-${l.id}.svg`;
+  a.click();
+  document.getElementById('export-msg').textContent = `Downloaded ${l.name} as SVG.`;
+}
+
+function copySVG() {
+  const l = LOGOS[selectedLogo];
+  const svg = l.render(accentColor, 120);
+  navigator.clipboard.writeText(svg).then(() => {
+    document.getElementById('export-msg').textContent = 'SVG code copied to clipboard!';
+  });
+}
+
+renderGrid();
+renderSwatches();
+</script>
